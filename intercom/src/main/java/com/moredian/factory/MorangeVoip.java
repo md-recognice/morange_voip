@@ -60,6 +60,7 @@ import static android.content.Context.BIND_AUTO_CREATE;
  */
 public class MorangeVoip {
     private String TAG = MorangeVoip.class.getSimpleName();
+    private String APP_HOST="http://di.dev.moredian.com:8000/";
     public static final String UPDATE_STATUS_ACTION = "com.umeng.message.example.action.UPDATE_STATUS";
     private Application mApplication;
     private static MorangeVoip instance=null;
@@ -408,7 +409,7 @@ public class MorangeVoip {
         ThreadPoolManager.getInstance().execute(new Runnable() {
             @Override
             public void run() {
-                RegisterPushDiretor.postRequest(BuildConfig.APP_HOST+"community/push/deviceToken/save",params);
+                RegisterPushDiretor.postRequest(APP_HOST+"community/push/deviceToken/save",params);
             }
         });
     }
@@ -419,7 +420,7 @@ public class MorangeVoip {
         ThreadPoolManager.getInstance().execute(new Runnable() {
             @Override
             public void run() {
-                RegisterPushDiretor.postRequest(BuildConfig.APP_HOST+"community/push/deviceToken/cancel",params);
+                RegisterPushDiretor.postRequest(APP_HOST+"community/push/deviceToken/cancel",params);
             }
         });
     }
