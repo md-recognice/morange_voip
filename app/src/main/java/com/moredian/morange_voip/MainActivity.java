@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
                 MorangeVoip.getInstance(getApplication()).initSipService("192.168.7.235","mobile_mcsapp18758226884","AE40EF0374B06C92DB991DB5C7B52CA2","18758226884");
                 MorangeVoip.getInstance(getApplication()).registerAcceptCall(true);
                 MorangeVoip.getInstance(getApplication()).registerSip();
-                MorangeVoip.getInstance(getApplication()).registerPush(getApplication().getPackageName()+"."+MipushTestActivity.class.getSimpleName());
+                MorangeVoip.getInstance(getApplication()).registerPush("",getApplication().getPackageName()+"."+MipushTestActivity.class.getSimpleName());
             }
         },1000);
     }
