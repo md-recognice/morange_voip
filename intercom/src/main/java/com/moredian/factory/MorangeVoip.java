@@ -397,12 +397,13 @@ public class MorangeVoip {
         }
     });
 
-    public void registerPush() {
+    public void registerPush(String miActivity) {
         String deviceToken = SharedPreferencesUtil.getString(mApplication,SharedPreferencesUtil.UMENG_TOKEN,"");
         String mobile = SharedPreferencesUtil.getString(mApplication,SharedPreferencesUtil.MOBILE,"");
         Map<String,String> params = new HashMap<>();
         params.put("appPackageName","com.moredian.morange");
         params.put("deviceToken",deviceToken);
+        params.put("miActivity",miActivity);
         params.put("channelVendor",android.os.Build.BRAND);
         params.put("operateSystemType","android");
         params.put("mobile",mobile);
