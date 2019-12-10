@@ -60,8 +60,6 @@ import static android.content.Context.BIND_AUTO_CREATE;
  */
 public class MorangeVoip {
     private String TAG = MorangeVoip.class.getSimpleName();
-    private String DEV_APP_HOST="http://di.dev.moredian.com:8000/";
-    private String RELEASE_APP_HOST="https://di.morecheng.com/";
 
     public static final String UPDATE_STATUS_ACTION = "com.umeng.message.example.action.UPDATE_STATUS";
     private Application mApplication;
@@ -399,7 +397,7 @@ public class MorangeVoip {
         }
     });
 
-    public void registerPush(String mobile,String miActivity) {
+    public void registerPush(String appHost,String mobile,String miActivity) {
         String deviceToken = SharedPreferencesUtil.getString(mApplication,SharedPreferencesUtil.UMENG_TOKEN,"");
         Map<String,String> params = new HashMap<>();
         params.put("appPackageName","com.moredian.morange");
@@ -411,18 +409,18 @@ public class MorangeVoip {
         ThreadPoolManager.getInstance().execute(new Runnable() {
             @Override
             public void run() {
-                RegisterPushDiretor.postRequest(RELEASE_APP_HOST+"community/push/deviceToken/save",params);
+                RegisterPushDiretor.postRequest(appHost+"community/push/deviceToken/save",params);
             }
         });
     }
 
-    public void unRegisterPush(String mobile) {
+    public void unRegisterPush(String appHost,String mobile) {
         Map<String,String> params = new HashMap<>();
         params.put("mobile",mobile);
         ThreadPoolManager.getInstance().execute(new Runnable() {
             @Override
             public void run() {
-                RegisterPushDiretor.postRequest(RELEASE_APP_HOST+"community/push/deviceToken/cancel",params);
+                RegisterPushDiretor.postRequest(appHost+"community/push/deviceToken/cancel",params);
             }
         });
     }
