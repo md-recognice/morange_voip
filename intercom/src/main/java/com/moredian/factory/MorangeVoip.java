@@ -264,7 +264,6 @@ public class MorangeVoip {
         this.sipAccount = sipAccount;
         this.sipPassword = sipPassword;
         this.mobile = mobile;
-        SharedPreferencesUtil.putString(mApplication,SharedPreferencesUtil.MOBILE,mobile);
     }
 
     public void registerAcceptCall(boolean isAcceptCall){
@@ -397,9 +396,8 @@ public class MorangeVoip {
         }
     });
 
-    public void registerPush(String miActivity) {
+    public void registerPush(String mobile,String miActivity) {
         String deviceToken = SharedPreferencesUtil.getString(mApplication,SharedPreferencesUtil.UMENG_TOKEN,"");
-        String mobile = SharedPreferencesUtil.getString(mApplication,SharedPreferencesUtil.MOBILE,"");
         Map<String,String> params = new HashMap<>();
         params.put("appPackageName","com.moredian.morange");
         params.put("deviceToken",deviceToken);
@@ -415,8 +413,7 @@ public class MorangeVoip {
         });
     }
 
-    public void unRegisterPush() {
-        String mobile = SharedPreferencesUtil.getString(mApplication,SharedPreferencesUtil.MOBILE,"");
+    public void unRegisterPush(String mobile) {
         Map<String,String> params = new HashMap<>();
         params.put("mobile",mobile);
         ThreadPoolManager.getInstance().execute(new Runnable() {

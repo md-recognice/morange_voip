@@ -25,8 +25,6 @@ import com.moredian.common.SipCode;
 import com.moredian.event.CallStatusEvent;
 import com.moredian.event.CallTimeEvent;
 import com.moredian.event.OpenDoorEvent;
-import com.moredian.factory.RegisterPushDiretor;
-import com.moredian.intercom.BuildConfig;
 import com.moredian.intercom.ISipAidlInterface;
 import com.moredian.intercom.SCallBackListener;
 import com.moredian.rtcengine.NativeRTC;
@@ -35,18 +33,13 @@ import com.moredian.ui.CommunicateActivity;
 import com.moredian.utils.CameraUtils;
 import com.moredian.utils.GsonUtils;
 import com.moredian.utils.LogUtils;
-import com.moredian.utils.RomUtil;
-import com.moredian.utils.SharedPreferencesUtil;
 import com.moredian.utils.SoundPoolUtil;
-import com.moredian.utils.ThreadPoolManager;
 import com.moredian.utils.ToastUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
