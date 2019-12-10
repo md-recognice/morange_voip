@@ -138,9 +138,7 @@ public class RomUtil {
         if (RomUtil.isMiui()){
             return isMiuiFloatWindowOpAllowed(context);
         }else if (RomUtil.isEmui()){
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                return Settings.canDrawOverlays(context);
-            }
+            return true;
         }else if (RomUtil.isVivo()){
             return getFloatPermissionStatus(context);
         }else if (RomUtil.isOppo()){
@@ -160,6 +158,8 @@ public class RomUtil {
             return true;
         }else if (RomUtil.isFlyme()){
             return true;
+        }else if (RomUtil.isVivo()){
+            return isVivoCanShowLockView(context);
         }
         return false;
     }
@@ -204,6 +204,32 @@ public class RomUtil {
         }
     }
 
+    /**
+     * 判断VIVO的锁屏显示权限
+     *
+     * @param context
+     * @return
+     */
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public static boolean isVivoCanShowLockView(Context context) {
+        String packageName = context.getPackageName();
+        Uri uri2 = Uri.parse("content://com.vivo.permissionmanager.provider.permission/control_locked_screen_action");
+        String selection = "pkgname = ?";
+        String[] selectionArgs = new String[]{packageName};
+        Cursor cursor = context.getContentResolver().query(uri2, null, selection, selectionArgs, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int currentstate = cursor.getInt(cursor.getColumnIndex("currentstate"));
+                cursor.close();
+                return 1!=currentstate;
+            } else {
+                cursor.close();
+                return false;
+            }
+        }
+        return false;
+    }
+
     public static void jumpToPermissionsEditorActivity(Activity activity,int requestCode) {
         if (RomUtil.isMiui()) {
             try {
@@ -226,6 +252,21 @@ public class RomUtil {
                     intent.setData(uri);
                     activity.startActivityForResult(intent,requestCode);
                 }
+            }
+        }else if (RomUtil.isVivo()){
+            Intent localIntent;
+            if (((Build.MODEL.contains("Y85")) && (!Build.MODEL.contains("Y85A"))) || (Build.MODEL.contains("vivo Y53L"))) {
+                localIntent = new Intent();
+                localIntent.setClassName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.PurviewTabActivity");
+                localIntent.putExtra("packagename", activity.getPackageName());
+                localIntent.putExtra("tabId", "1");
+                activity.startActivityForResult(localIntent,requestCode);
+            } else {
+                localIntent = new Intent();
+                localIntent.setClassName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.SoftPermissionDetailActivity");
+                localIntent.setAction("secure.intent.action.softPermissionDetail");
+                localIntent.putExtra("packagename", activity.getPackageName());
+                activity.startActivityForResult(localIntent,requestCode);
             }
         }
     }
@@ -255,7 +296,7 @@ public class RomUtil {
      * 获取悬浮窗权限状态
      *
      * @param context
-     * @return 1或其他是没有打开，0是打开，该状态的定义和{@link android.app.AppOpsManager#MODE_ALLOWED}，MODE_IGNORED等值差不多，自行查阅源码
+     * @return 1或其他是没有打开，0是打开，该状态的定义和{@link AppOpsManager#MODE_ALLOWED}，MODE_IGNORED等值差不多，自行查阅源码
      */
     public static boolean getFloatPermissionStatus(Context context) {
         if (context == null) {
@@ -308,67 +349,64 @@ public class RomUtil {
         return 1;
     }
 
-
-        public static final String HAS_OPEN_SETTING_AUTO_START = "hasOpenSettingAutoStart";//是否已经打开过设置自启动界面的标记，存储起来
-
-        /*打开自启动管理页*/
-        public static void openStart(Context context){
-            if(Build.VERSION.SDK_INT < 23){
-                return;
-            }
-            Intent intent = new Intent();
-            if(RomUtil.isEmui()){//华为
-                ComponentName componentName = new ComponentName("com.huawei.systemmanager","com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity");
-                intent.setComponent(componentName);
-            }else if(RomUtil.isMiui()){//小米
-                ComponentName componentName = new ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity");
-                intent.setComponent(componentName);
-            }else if(RomUtil.isOppo()){//oppo
-                ComponentName componentName = null;
-                if (Build.VERSION.SDK_INT >=26){
-                    componentName =new ComponentName("com.coloros.safecenter","com.coloros.safecenter.startupapp.StartupAppListActivity");
-                }else {
-                    componentName = new ComponentName("com.color.safecenter", "com.color.safecenter.permission.startup.StartupAppListActivity");
-                }
-                intent.setComponent(componentName);
-                //上面的代码不管用了，因为oppo手机也是手机管家进行自启动管理
-            }else if(RomUtil.isVivo()){//Vivo
-                ComponentName componentName = null;
-                if (Build.VERSION.SDK_INT >=26) {
-                    componentName =new ComponentName("com.vivo.permissionmanager","com.vivo.permissionmanager.activity.PurviewTabActivity");
-                }else {
-                    componentName = new ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.SoftwareManagerActivity");
-                }
-                intent.setComponent(componentName);
-            }else if(RomUtil.isFlyme()){//魅族
-                // 通过测试，发现魅族是真恶心，也是够了，之前版本还能查看到关于设置自启动这一界面，
-                // 系统更新之后，完全找不到了，心里默默Fuck！
-                // 针对魅族，我们只能通过魅族内置手机管家去设置自启动，
-                // 所以我在这里直接跳转到魅族内置手机管家界面，具体结果请看图
-                ComponentName componentName = ComponentName.unflattenFromString("com.meizu.safe" +
-                        "/.permission.PermissionMainActivity");
-                intent.setComponent(componentName);
-            }else {
-                // 以上只是市面上主流机型，由于公司你懂的，所以很不容易才凑齐以上设备
-                // 针对于其他设备，我们只能调整当前系统app查看详情界面
-                // 在此根据用户手机当前版本跳转系统设置界面
-                if (Build.VERSION.SDK_INT >= 9) {
-                    intent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
-                    intent.setData(Uri.fromParts("package", context.getPackageName(), null));
-                } else if (Build.VERSION.SDK_INT <= 8) {
-                    intent.setAction(Intent.ACTION_VIEW);
-                    intent.setClassName("com.android.settings",
-                            "com.android.settings.InstalledAppDetails");
-                    intent.putExtra("com.android.settings.ApplicationPkgName",
-                            context.getPackageName());
-                }
-                intent = new Intent(Settings.ACTION_SETTINGS);
-            }
-            try{
-                context.startActivity(intent);
-            }catch (Exception e){//抛出异常就直接打开设置页面
-                Intent intent1 = new Intent(Settings.ACTION_SETTINGS);
-                context.startActivity(intent1);
-            }
+    /*打开自启动管理页*/
+    public static void openStart(Activity activity,int requestCode){
+        if(Build.VERSION.SDK_INT < 23){
+            return;
         }
+        Intent intent = new Intent();
+        if(RomUtil.isEmui()){//华为
+            ComponentName componentName = new ComponentName("com.huawei.systemmanager","com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity");
+            intent.setComponent(componentName);
+        }else if(RomUtil.isMiui()){//小米
+            ComponentName componentName = new ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity");
+            intent.setComponent(componentName);
+        }else if(RomUtil.isOppo()){//oppo
+            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            intent.addCategory(Intent.CATEGORY_DEFAULT);
+            intent.setData(Uri.parse("package:" + activity.getPackageName()));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+        }else if(RomUtil.isVivo()){//Vivo
+            if (((Build.MODEL.contains("Y85")) && (!Build.MODEL.contains("Y85A"))) || (Build.MODEL.contains("vivo Y53L"))) {
+                intent.setClassName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.PurviewTabActivity");
+                intent.putExtra("packagename", activity.getPackageName());
+                intent.putExtra("tabId", "1");
+            } else {
+                intent.setClassName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.SoftPermissionDetailActivity");
+                intent.setAction("secure.intent.action.softPermissionDetail");
+                intent.putExtra("packagename", activity.getPackageName());
+            }
+        }else if(RomUtil.isFlyme()){//魅族
+            // 通过测试，发现魅族是真恶心，也是够了，之前版本还能查看到关于设置自启动这一界面，
+            // 系统更新之后，完全找不到了，心里默默Fuck！
+            // 针对魅族，我们只能通过魅族内置手机管家去设置自启动，
+            // 所以我在这里直接跳转到魅族内置手机管家界面，具体结果请看图
+            ComponentName componentName = ComponentName.unflattenFromString("com.meizu.safe" +
+                    "/.permission.PermissionMainActivity");
+            intent.setComponent(componentName);
+        }else {
+            // 以上只是市面上主流机型，由于公司你懂的，所以很不容易才凑齐以上设备
+            // 针对于其他设备，我们只能调整当前系统app查看详情界面
+            // 在此根据用户手机当前版本跳转系统设置界面
+            if (Build.VERSION.SDK_INT >= 9) {
+                intent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
+                intent.setData(Uri.fromParts("package", activity.getPackageName(), null));
+            } else if (Build.VERSION.SDK_INT <= 8) {
+                intent.setAction(Intent.ACTION_VIEW);
+                intent.setClassName("com.android.settings",
+                        "com.android.settings.InstalledAppDetails");
+                intent.putExtra("com.android.settings.ApplicationPkgName",
+                        activity.getPackageName());
+            }
+            intent = new Intent(Settings.ACTION_SETTINGS);
+        }
+        try{
+            activity.startActivityForResult(intent,requestCode);
+        }catch (Exception e){//抛出异常就直接打开设置页面
+            Intent intent1 = new Intent(Settings.ACTION_SETTINGS);
+            activity.startActivityForResult(intent1,requestCode);
+        }
+    }
 }
