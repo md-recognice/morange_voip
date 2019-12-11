@@ -23,7 +23,6 @@ import com.moredian.factory.interfaces.PushCallBack;
 import com.moredian.factory.interfaces.SipCallBack;
 import com.moredian.factory.network.NetWorkMonitorManager;
 import com.moredian.factory.network.NetWorkState;
-import com.moredian.intercom.BuildConfig;
 import com.moredian.intercom.ISipAidlInterface;
 import com.moredian.intercom.R;
 import com.moredian.intercom.SCallBackListener;
