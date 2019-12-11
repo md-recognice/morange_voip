@@ -61,6 +61,8 @@ import static android.content.Context.BIND_AUTO_CREATE;
 public class MorangeVoip {
     private String TAG = MorangeVoip.class.getSimpleName();
     public static final String UPDATE_STATUS_ACTION = "com.umeng.message.example.action.UPDATE_STATUS";
+    private String DEV_APP_HOST="http://di.dev.moredian.com:8000/";
+    private String RELEASE_APP_HOST="https://di.morecheng.com/";
     private Application mApplication;
     private static MorangeVoip instance=null;
     private MorangeDirector mMorangeDirector;
@@ -74,7 +76,6 @@ public class MorangeVoip {
     private SipCallBack mSipCallBack;
     private String sipServcer,sipAccount,sipPassword;
     private boolean mIsRegister,isAcceptCall;
-    private String mobile;
 
     public static MorangeVoip getInstance(Application application) {
         if (instance == null) {
@@ -259,12 +260,10 @@ public class MorangeVoip {
         MiPushRegistar.register(mApplication, mCollocation.getXiaomiId(), mCollocation.getXiaomiKey());
     }
 
-    public void initSipService(String sipServer,String sipAccount,String sipPassword,String mobile){
+    public void initSipService(String sipServer,String sipAccount,String sipPassword){
         this.sipServcer = sipServer;
         this.sipAccount = sipAccount;
         this.sipPassword = sipPassword;
-        this.mobile = mobile;
-        SharedPreferencesUtil.putString(mApplication,SharedPreferencesUtil.MOBILE,mobile);
     }
 
     public void registerAcceptCall(boolean isAcceptCall){
@@ -397,31 +396,30 @@ public class MorangeVoip {
         }
     });
 
-    public void registerPush() {
+    public void registerPush(String mobile,String miActivity) {
         String deviceToken = SharedPreferencesUtil.getString(mApplication,SharedPreferencesUtil.UMENG_TOKEN,"");
-        String mobile = SharedPreferencesUtil.getString(mApplication,SharedPreferencesUtil.MOBILE,"");
         Map<String,String> params = new HashMap<>();
         params.put("appPackageName","com.moredian.morange");
         params.put("deviceToken",deviceToken);
         params.put("channelVendor",android.os.Build.BRAND);
         params.put("operateSystemType","android");
         params.put("mobile",mobile);
+        params.put("miActivity",miActivity);
         ThreadPoolManager.getInstance().execute(new Runnable() {
             @Override
             public void run() {
-                RegisterPushDiretor.postRequest(BuildConfig.APP_HOST+"community/push/deviceToken/save",params);
+                RegisterPushDiretor.postRequest(DEV_APP_HOST+"community/push/deviceToken/save",params);
             }
         });
     }
 
-    public void unRegisterPush() {
-        String mobile = SharedPreferencesUtil.getString(mApplication,SharedPreferencesUtil.MOBILE,"");
+    public void unRegisterPush(String mobile) {
         Map<String,String> params = new HashMap<>();
         params.put("mobile",mobile);
         ThreadPoolManager.getInstance().execute(new Runnable() {
             @Override
             public void run() {
-                RegisterPushDiretor.postRequest(BuildConfig.APP_HOST+"community/push/deviceToken/cancel",params);
+                RegisterPushDiretor.postRequest(DEV_APP_HOST+"community/push/deviceToken/cancel",params);
             }
         });
     }
