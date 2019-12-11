@@ -277,15 +277,15 @@ public class MorangeVoip {
     }
 
     public void unregisterSip(){
-        if (iSipAidlInterface!=null){
-            try {
-                iSipAidlInterface.unRegisterSip();
-                iSipAidlInterface.unregisterListener(stub);
-                iSipAidlInterface = null;
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
+//        if (iSipAidlInterface!=null){
+//            try {
+//                iSipAidlInterface.unRegisterSip();
+//                iSipAidlInterface.unregisterListener(stub);
+//                iSipAidlInterface = null;
+//            } catch (RemoteException e) {
+//                e.printStackTrace();
+//            }
+//        }
         if (serviceConnection!=null){
             mApplication.unbindService(serviceConnection);
         }
