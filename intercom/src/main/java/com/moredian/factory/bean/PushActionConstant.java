@@ -1,4 +1,4 @@
-package com.moredian.morange_voip.bean;
+package com.moredian.factory.bean;
 
 /**
  * <pre>
