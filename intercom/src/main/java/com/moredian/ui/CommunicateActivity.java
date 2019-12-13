@@ -464,6 +464,10 @@ public class CommunicateActivity extends AppCompatActivity implements View.OnCli
                         incomeSwitchAudioLl.setVisibility(View.INVISIBLE);
                     }
                 }
+            }else if (CommunicateConstants.TIME_OUT == status){
+                LogUtils.e("对方无应答："+status);
+                ToastUtils.getInstance().showToast("对方无应答");
+                showCallFailView();
             }
             else {
                 LogUtils.e("未知错误："+status);

@@ -68,6 +68,11 @@ public interface CommunicateConstants {
      */
     int ERROR = 400;
     /**
+     * 对方无应答
+     */
+    int TIME_OUT = 408;
+
+    /**
      * 一般是表示呼叫的时候，对方注册不在线
      */
     int TEMPORARY_UNAVAILABLE = 480;
