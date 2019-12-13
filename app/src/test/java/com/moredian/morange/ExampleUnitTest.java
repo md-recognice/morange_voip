@@ -1,4 +1,4 @@
-package com.moredian.morange_voip;
+package com.moredian.morange;
 
 import org.junit.Test;
 

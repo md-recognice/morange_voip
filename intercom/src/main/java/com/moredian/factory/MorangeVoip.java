@@ -127,6 +127,7 @@ public class MorangeVoip {
         UMConfigure.init(mApplication, mCollocation.getUmengAppKey(), mCollocation.getUmengChannel(), UMConfigure.DEVICE_TYPE_PHONE, mCollocation.getUmengSecret());
         //获取消息推送代理示例
         PushAgent mPushAgent = PushAgent.getInstance(mApplication);
+        mPushAgent.setResourcePackageName(mApplication.getPackageName());
         mPushAgent.setNotificationPlayVibrate(MsgConstant.NOTIFICATION_PLAY_SDK_ENABLE);
 
         UmengMessageHandler messageHandler = new UmengMessageHandler() {
