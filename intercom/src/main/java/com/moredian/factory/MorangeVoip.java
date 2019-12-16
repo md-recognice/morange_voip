@@ -288,6 +288,7 @@ public class MorangeVoip {
         if (serviceConnection!=null){
             mApplication.unbindService(serviceConnection);
         }
+        serviceIntent = null;
         NetWorkMonitorManager.getInstance().unregister(this);
     }
 
