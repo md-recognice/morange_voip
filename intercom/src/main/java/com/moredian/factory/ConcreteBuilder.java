@@ -4,10 +4,11 @@ public class ConcreteBuilder extends Builder {
     private PushCollocation mCollocation = new PushCollocation();
 
     @Override
-    public void bindUmeng(String umengAppKey, String umengSecret, String umengChannel) {
+    public void bindUmeng(String umengAppKey, String umengSecret, String umengChannel,String packerName) {
         mCollocation.setUmengAppKey(umengAppKey);
         mCollocation.setUmengSecret(umengSecret);
         mCollocation.setUmengChannel(umengChannel);
+        mCollocation.setPackerName(packerName);
     }
 
     @Override
