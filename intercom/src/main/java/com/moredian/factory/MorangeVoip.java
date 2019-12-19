@@ -11,6 +11,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -397,20 +398,27 @@ public class MorangeVoip {
     });
 
     public void registerPush(String mobile,String miActivity) {
-        String deviceToken = SharedPreferencesUtil.getString(mApplication,SharedPreferencesUtil.UMENG_TOKEN,"");
-        Map<String,String> params = new HashMap<>();
-        params.put("appPackageName","com.moredian.morange");
-        params.put("deviceToken",deviceToken);
-        params.put("channelVendor",android.os.Build.BRAND);
-        params.put("operateSystemType","android");
-        params.put("mobile",mobile);
-        params.put("miActivity",miActivity);
-        ThreadPoolManager.getInstance().execute(new Runnable() {
-            @Override
-            public void run() {
-                RegisterPushDiretor.postRequest(DEV_APP_HOST+"community/push/deviceToken/save",params);
+        while (true){
+            String deviceToken = SharedPreferencesUtil.getString(mApplication,SharedPreferencesUtil.UMENG_TOKEN,"");
+            if (TextUtils.isEmpty(deviceToken)){
+                SystemClock.sleep(500);
+                continue;
             }
-        });
+            Map<String,String> params = new HashMap<>();
+            params.put("appPackageName","com.moredian.morange");
+            params.put("deviceToken",deviceToken);
+            params.put("channelVendor",android.os.Build.BRAND);
+            params.put("operateSystemType","android");
+            params.put("mobile",mobile);
+            params.put("miActivity",miActivity);
+            ThreadPoolManager.getInstance().execute(new Runnable() {
+                @Override
+                public void run() {
+                    RegisterPushDiretor.postRequest(DEV_APP_HOST+"community/push/deviceToken/save",params);
+                }
+            });
+            break;
+        }
     }
 
     public void unRegisterPush(String mobile) {
