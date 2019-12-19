@@ -1,7 +1,6 @@
 package com.moredian.morange_voip;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 

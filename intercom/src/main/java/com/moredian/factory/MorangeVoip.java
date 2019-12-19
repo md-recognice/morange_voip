@@ -222,7 +222,9 @@ public class MorangeVoip {
                 LogUtils.e("dealWithCustomAction-"+msg.custom);
                 try {
                     CustomMessage customMessage = new CustomMessage(msg.getRaw());
-                    mPushCallBack.dealWithCustomAction(customMessage);
+                    if (mPushCallBack!=null){
+                        mPushCallBack.dealWithCustomAction(customMessage);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -236,7 +238,9 @@ public class MorangeVoip {
             @Override
             public void onSuccess(String deviceToken) {
                 Log.e(TAG, "device token: " + deviceToken);
-                mPushCallBack.onRegisterCallBack(true,deviceToken);
+                if (mPushCallBack!=null){
+                    mPushCallBack.onRegisterCallBack(true,deviceToken);
+                }
 //                umengDeviceToken = deviceToken;
                 String umengDtn = SharedPreferencesUtil.getString(mApplication,SharedPreferencesUtil.UMENG_TOKEN,"");
                 if (!TextUtils.equals(deviceToken,umengDtn)){
@@ -248,7 +252,9 @@ public class MorangeVoip {
             @Override
             public void onFailure(String s, String s1) {
                 Log.i(TAG, "register failed: " + s + " " + s1);
-                mPushCallBack.onRegisterCallBack(false,"");
+                if (mPushCallBack!=null){
+                    mPushCallBack.onRegisterCallBack(false,"");
+                }
                 mApplication.sendBroadcast(new Intent(UPDATE_STATUS_ACTION));
             }
         });
@@ -410,6 +416,7 @@ public class MorangeVoip {
         public void run() {
             while (true){
                 String deviceToken = SharedPreferencesUtil.getString(mApplication,SharedPreferencesUtil.UMENG_TOKEN,"");
+                LogUtils.e("registerPushRunable deviceToken:"+deviceToken);
                 if (TextUtils.isEmpty(deviceToken)){
                     SystemClock.sleep(500);
                     continue;
