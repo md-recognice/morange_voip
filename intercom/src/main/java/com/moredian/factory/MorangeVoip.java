@@ -90,8 +90,8 @@ public class MorangeVoip {
         mMorangeDirector = new MorangeDirector(mConcreteBuilder);
     }
 
-    public void setUmeng(String umengAppKey,String umengSecret,String umengChannel){
-        mMorangeDirector.bindUmeng(umengAppKey, umengSecret, umengChannel);
+    public void setUmeng(String umengAppKey,String umengSecret,String umengChannel,String packerName){
+        mMorangeDirector.bindUmeng(umengAppKey, umengSecret, umengChannel,packerName);
     }
 
     public void setXiaomi(String xiaomiId,String xiaomiKey){
@@ -128,7 +128,7 @@ public class MorangeVoip {
         UMConfigure.init(mApplication, mCollocation.getUmengAppKey(), mCollocation.getUmengChannel(), UMConfigure.DEVICE_TYPE_PHONE, mCollocation.getUmengSecret());
         //获取消息推送代理示例
         PushAgent mPushAgent = PushAgent.getInstance(mApplication);
-        mPushAgent.setResourcePackageName(mApplication.getPackageName());
+        mPushAgent.setResourcePackageName(mCollocation.getPackerName());
         mPushAgent.setNotificationPlayVibrate(MsgConstant.NOTIFICATION_PLAY_SDK_ENABLE);
 
         UmengMessageHandler messageHandler = new UmengMessageHandler() {
@@ -289,6 +289,7 @@ public class MorangeVoip {
         if (serviceConnection!=null){
             mApplication.unbindService(serviceConnection);
         }
+        serviceIntent = null;
         NetWorkMonitorManager.getInstance().unregister(this);
     }
 

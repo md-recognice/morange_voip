@@ -4,6 +4,7 @@ public class PushCollocation {
     private String umengAppKey;
     private String umengSecret;
     private String umengChannel;
+    private String packerName;
     private String xiaomiId;
     private String xiaomiKey;
     private String hwId;
@@ -19,6 +20,14 @@ public class PushCollocation {
 
     public void setUmengChannel(String umengChannel) {
         this.umengChannel = umengChannel;
+    }
+
+    public String getPackerName() {
+        return packerName;
+    }
+
+    public void setPackerName(String packerName) {
+        this.packerName = packerName;
     }
 
     public void setXiaomiId(String xiaomiId) {

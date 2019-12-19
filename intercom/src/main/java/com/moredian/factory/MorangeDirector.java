@@ -7,8 +7,8 @@ public class MorangeDirector {
         this.mBuild = build;
     }
 
-    public void bindUmeng(String umengAppKey,String umengSecret,String umengChannel) {
-       mBuild.bindUmeng(umengAppKey,umengSecret,umengChannel);
+    public void bindUmeng(String umengAppKey,String umengSecret,String umengChannel,String packerName) {
+       mBuild.bindUmeng(umengAppKey,umengSecret,umengChannel,packerName);
     }
 
     public void bindXiaomi(String xiaomiId,String xiaomiKey) {
