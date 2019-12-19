@@ -75,6 +75,7 @@ public class MorangeVoip {
     private ISipAidlInterface iSipAidlInterface;
     private SipCallBack mSipCallBack;
     private String sipServcer,sipAccount,sipPassword;
+    private String mobile,miActivity;
     private boolean mIsRegister,isAcceptCall;
 
     public static MorangeVoip getInstance(Application application) {
@@ -399,28 +400,33 @@ public class MorangeVoip {
     });
 
     public void registerPush(String mobile,String miActivity) {
-        while (true){
-            String deviceToken = SharedPreferencesUtil.getString(mApplication,SharedPreferencesUtil.UMENG_TOKEN,"");
-            if (TextUtils.isEmpty(deviceToken)){
-                SystemClock.sleep(500);
-                continue;
-            }
-            Map<String,String> params = new HashMap<>();
-            params.put("appPackageName","com.moredian.morange");
-            params.put("deviceToken",deviceToken);
-            params.put("channelVendor",android.os.Build.BRAND);
-            params.put("operateSystemType","android");
-            params.put("mobile",mobile);
-            params.put("miActivity",miActivity);
-            ThreadPoolManager.getInstance().execute(new Runnable() {
-                @Override
-                public void run() {
-                    RegisterPushDiretor.postRequest(DEV_APP_HOST+"community/push/deviceToken/save",params);
-                }
-            });
-            break;
-        }
+        this.mobile = mobile;
+        this.miActivity = miActivity;
+        ThreadPoolManager.getInstance().execute(registerPushRunable);
     }
+
+    Runnable registerPushRunable = new Runnable() {
+        @Override
+        public void run() {
+            while (true){
+                String deviceToken = SharedPreferencesUtil.getString(mApplication,SharedPreferencesUtil.UMENG_TOKEN,"");
+                if (TextUtils.isEmpty(deviceToken)){
+                    SystemClock.sleep(500);
+                    continue;
+                }
+                Map<String,String> params = new HashMap<>();
+                params.put("appPackageName","com.moredian.morange");
+                params.put("deviceToken",deviceToken);
+                params.put("channelVendor",android.os.Build.BRAND);
+                params.put("operateSystemType","android");
+                params.put("mobile",mobile);
+                params.put("miActivity",miActivity);
+                RegisterPushDiretor.postRequest(DEV_APP_HOST+"community/push/deviceToken/save",params);
+                break;
+            }
+
+        }
+    };
 
     public void unRegisterPush(String mobile) {
         Map<String,String> params = new HashMap<>();
