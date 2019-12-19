@@ -11,6 +11,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -23,7 +24,6 @@ import com.moredian.factory.interfaces.PushCallBack;
 import com.moredian.factory.interfaces.SipCallBack;
 import com.moredian.factory.network.NetWorkMonitorManager;
 import com.moredian.factory.network.NetWorkState;
-import com.moredian.intercom.BuildConfig;
 import com.moredian.intercom.ISipAidlInterface;
 import com.moredian.intercom.R;
 import com.moredian.intercom.SCallBackListener;
@@ -62,6 +62,8 @@ public class MorangeVoip {
     private String TAG = MorangeVoip.class.getSimpleName();
 
     public static final String UPDATE_STATUS_ACTION = "com.umeng.message.example.action.UPDATE_STATUS";
+    private String DEV_APP_HOST="http://di.dev.moredian.com:8000/";
+    private String RELEASE_APP_HOST="https://di.morecheng.com/";
     private Application mApplication;
     private static MorangeVoip instance=null;
     private MorangeDirector mMorangeDirector;
@@ -74,8 +76,8 @@ public class MorangeVoip {
     private ISipAidlInterface iSipAidlInterface;
     private SipCallBack mSipCallBack;
     private String sipServcer,sipAccount,sipPassword;
+    private String mobile,miActivity;
     private boolean mIsRegister,isAcceptCall;
-    private String mobile;
 
     public static MorangeVoip getInstance(Application application) {
         if (instance == null) {
@@ -90,8 +92,8 @@ public class MorangeVoip {
         mMorangeDirector = new MorangeDirector(mConcreteBuilder);
     }
 
-    public void setUmeng(String umengAppKey,String umengSecret,String umengChannel){
-        mMorangeDirector.bindUmeng(umengAppKey, umengSecret, umengChannel);
+    public void setUmeng(String umengAppKey,String umengSecret,String umengChannel,String packerName){
+        mMorangeDirector.bindUmeng(umengAppKey, umengSecret, umengChannel,packerName);
     }
 
     public void setXiaomi(String xiaomiId,String xiaomiKey){
@@ -128,6 +130,7 @@ public class MorangeVoip {
         UMConfigure.init(mApplication, mCollocation.getUmengAppKey(), mCollocation.getUmengChannel(), UMConfigure.DEVICE_TYPE_PHONE, mCollocation.getUmengSecret());
         //获取消息推送代理示例
         PushAgent mPushAgent = PushAgent.getInstance(mApplication);
+        mPushAgent.setResourcePackageName(mCollocation.getPackerName());
         mPushAgent.setNotificationPlayVibrate(MsgConstant.NOTIFICATION_PLAY_SDK_ENABLE);
 
         UmengMessageHandler messageHandler = new UmengMessageHandler() {
@@ -220,7 +223,9 @@ public class MorangeVoip {
                 LogUtils.e("dealWithCustomAction-"+msg.custom);
                 try {
                     CustomMessage customMessage = new CustomMessage(msg.getRaw());
-                    mPushCallBack.dealWithCustomAction(customMessage);
+                    if (mPushCallBack!=null){
+                        mPushCallBack.dealWithCustomAction(customMessage);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -234,7 +239,9 @@ public class MorangeVoip {
             @Override
             public void onSuccess(String deviceToken) {
                 Log.e(TAG, "device token: " + deviceToken);
-                mPushCallBack.onRegisterCallBack(true,deviceToken);
+                if (mPushCallBack!=null){
+                    mPushCallBack.onRegisterCallBack(true,deviceToken);
+                }
 //                umengDeviceToken = deviceToken;
                 String umengDtn = SharedPreferencesUtil.getString(mApplication,SharedPreferencesUtil.UMENG_TOKEN,"");
                 if (!TextUtils.equals(deviceToken,umengDtn)){
@@ -246,7 +253,9 @@ public class MorangeVoip {
             @Override
             public void onFailure(String s, String s1) {
                 Log.i(TAG, "register failed: " + s + " " + s1);
-                mPushCallBack.onRegisterCallBack(false,"");
+                if (mPushCallBack!=null){
+                    mPushCallBack.onRegisterCallBack(false,"");
+                }
                 mApplication.sendBroadcast(new Intent(UPDATE_STATUS_ACTION));
             }
         });
@@ -260,11 +269,10 @@ public class MorangeVoip {
         MiPushRegistar.register(mApplication, mCollocation.getXiaomiId(), mCollocation.getXiaomiKey());
     }
 
-    public void initSipService(String sipServer,String sipAccount,String sipPassword,String mobile){
+    public void initSipService(String sipServer,String sipAccount,String sipPassword){
         this.sipServcer = sipServer;
         this.sipAccount = sipAccount;
         this.sipPassword = sipPassword;
-        this.mobile = mobile;
     }
 
     public void registerAcceptCall(boolean isAcceptCall){
@@ -398,30 +406,43 @@ public class MorangeVoip {
         }
     });
 
-    public void registerPush(String appHost,String mobile,String miActivity) {
-        String deviceToken = SharedPreferencesUtil.getString(mApplication,SharedPreferencesUtil.UMENG_TOKEN,"");
-        Map<String,String> params = new HashMap<>();
-        params.put("appPackageName","com.moredian.morange");
-        params.put("deviceToken",deviceToken);
-        params.put("miActivity",miActivity);
-        params.put("channelVendor",android.os.Build.BRAND);
-        params.put("operateSystemType","android");
-        params.put("mobile",mobile);
-        ThreadPoolManager.getInstance().execute(new Runnable() {
-            @Override
-            public void run() {
-                RegisterPushDiretor.postRequest(appHost+"community/push/deviceToken/save",params);
-            }
-        });
+    public void registerPush(String mobile,String miActivity) {
+        this.mobile = mobile;
+        this.miActivity = miActivity;
+        ThreadPoolManager.getInstance().execute(registerPushRunable);
     }
 
-    public void unRegisterPush(String appHost,String mobile) {
+    Runnable registerPushRunable = new Runnable() {
+        @Override
+        public void run() {
+            while (true){
+                String deviceToken = SharedPreferencesUtil.getString(mApplication,SharedPreferencesUtil.UMENG_TOKEN,"");
+                LogUtils.e("registerPushRunable deviceToken:"+deviceToken);
+                if (TextUtils.isEmpty(deviceToken)){
+                    SystemClock.sleep(500);
+                    continue;
+                }
+                Map<String,String> params = new HashMap<>();
+                params.put("appPackageName","com.moredian.morange");
+                params.put("deviceToken",deviceToken);
+                params.put("channelVendor",android.os.Build.BRAND);
+                params.put("operateSystemType","android");
+                params.put("mobile",mobile);
+                params.put("miActivity",miActivity);
+                RegisterPushDiretor.postRequest(DEV_APP_HOST+"community/push/deviceToken/save",params);
+                break;
+            }
+
+        }
+    };
+
+    public void unRegisterPush(String mobile) {
         Map<String,String> params = new HashMap<>();
         params.put("mobile",mobile);
         ThreadPoolManager.getInstance().execute(new Runnable() {
             @Override
             public void run() {
-                RegisterPushDiretor.postRequest(appHost+"community/push/deviceToken/cancel",params);
+                RegisterPushDiretor.postRequest(DEV_APP_HOST+"community/push/deviceToken/cancel",params);
             }
         });
     }

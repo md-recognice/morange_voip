@@ -5,10 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.moredian.morange_voip.bean.Body;
-import com.moredian.morange_voip.bean.CustomPushMessage;
-import com.moredian.morange_voip.bean.PushActionConstant;
-import com.moredian.morange_voip.bean.PushMessage;
+import com.moredian.factory.bean.Body;
+import com.moredian.factory.bean.CustomPushMessage;
+import com.moredian.factory.bean.PushActionConstant;
+import com.moredian.factory.bean.PushMessage;
 import com.moredian.utils.GsonUtils;
 import com.moredian.utils.LogUtils;
 import com.umeng.message.UmengNotifyClickActivity;

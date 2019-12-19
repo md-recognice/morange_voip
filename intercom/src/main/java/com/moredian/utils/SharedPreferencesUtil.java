@@ -10,8 +10,6 @@ public class SharedPreferencesUtil {
 
     public static final String UMENG_TOKEN = "UMENG_TOKEN";
 
-    public static final String MOBILE = "MOBILE";
-
     private static SharedPreferences sharedPreferences;
  
     /**

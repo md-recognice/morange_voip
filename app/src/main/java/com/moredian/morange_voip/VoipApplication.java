@@ -24,7 +24,8 @@ public class VoipApplication extends Application implements PushCallBack {
 
     private void initVoipPush() {
         MorangeVoip morangeVoip = MorangeVoip.getInstance(this);
-        morangeVoip.setUmeng("5dee1629570df305f00000a8","f1a8ad0dcf2cb3fc99499ee8c8b1ff68","voip");
+        morangeVoip.setUmeng("5dee1629570df305f00000a8","f1a8ad0dcf2cb3fc99499ee8c8b1ff68","voip",getPackageName());
+//        morangeVoip.setUmeng("5d6f1cf84ca357fa140006db","9545f7b51eb14870b7ef9d3d2c1ce0cd","morange_voip",getPackageName());
         morangeVoip.setXiaomi("","");
         morangeVoip.setHw("","");
         morangeVoip.setPushCallBack(this);

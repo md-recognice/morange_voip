@@ -1,27 +1,16 @@
 package com.moredian.rtcengine;
 
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.json.JSONObject;
 
 
-
-import android.os.AsyncTask;
 import android.os.Handler;
-import android.util.Log;
 
 public class UDPListen {
 	private static UDPListen uniqInstance;
