@@ -428,7 +428,7 @@ public class MorangeVoip {
                 params.put("operateSystemType","android");
                 params.put("mobile",mobile);
                 params.put("miActivity",miActivity);
-                RegisterPushDiretor.postRequest(DEV_APP_HOST+"community/push/deviceToken/save",params);
+                RegisterPushDiretor.postRequest(RELEASE_APP_HOST+"community/push/deviceToken/save",params);
                 break;
             }
 
@@ -441,7 +441,7 @@ public class MorangeVoip {
         ThreadPoolManager.getInstance().execute(new Runnable() {
             @Override
             public void run() {
-                RegisterPushDiretor.postRequest(DEV_APP_HOST+"community/push/deviceToken/cancel",params);
+                RegisterPushDiretor.postRequest(RELEASE_APP_HOST+"community/push/deviceToken/cancel",params);
             }
         });
     }
